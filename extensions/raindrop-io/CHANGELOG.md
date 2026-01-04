@@ -1,5 +1,10 @@
 # Raindrop.io Extension Changelog
 
+## [Windows/Linux Compatibility] - 2026-01-04
+
+- Add platform check to skip AppleScript fallback on non-macOS systems
+- Show helpful error message directing users to install Raycast Browser Extension
+
 ## [Quick Add Bookmark] - 2026-01-01
 
 - Added Quick Add Bookmark command for saving URLs instantly without opening a form

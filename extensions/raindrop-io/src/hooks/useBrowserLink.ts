@@ -5,8 +5,10 @@ import { runAppleScript, usePromise } from "@raycast/utils";
  * Custom hook to get the current URL from the active browser tab.
  *
  * This hook attempts to retrieve the URL using the following methods in order:
- * 1. Browser Extension API (if available) - preferred method
- * 2. AppleScript - fallback for supported browsers
+ * 1. Browser Extension API (if available) - preferred method, works cross-platform
+ * 2. AppleScript - fallback for supported browsers (macOS only)
+ *
+ * On Windows/Linux, the Browser Extension is required as AppleScript is not available.
  *
  * @returns {Promise<string>} The URL of the active browser tab
  * @throws {Error} If the browser is not supported or no active tab is found
@@ -37,7 +39,12 @@ export function useBrowserLink() {
         }
       }
 
-      // Fallback: AppleScript-based processing
+      // AppleScript fallback only works on macOS
+      if (process.platform !== "darwin") {
+        throw new Error("Please install the Raycast Browser Extension to use this feature on Windows/Linux");
+      }
+
+      // Fallback: AppleScript-based processing (macOS only)
       const app = await getFrontmostApplication();
 
       switch (app.bundleId) {
