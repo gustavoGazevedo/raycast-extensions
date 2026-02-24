@@ -7,7 +7,7 @@
   "author": "Vorm--",
   "license": "MIT",
   "platforms": ["Windows"],
-  "categories": ["System"],
+  "categories": ["System", "Media", "Productivity", "Communication"],
   "external": ["koffi", "react"],
   "commands": [
     {

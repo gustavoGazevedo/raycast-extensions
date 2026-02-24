@@ -10,16 +10,6 @@ import {
 
 const QUICK_SETTINGS_KEY = "vm.quick-settings.v1";
 
-interface ExtensionPreferences {
-  muteBehavior?: string;
-  undoTtlSeconds?: string;
-  voicemeeterExecutablePath?: string;
-  increaseStep?: string;
-  decreaseStep?: string;
-  volumePrimaryAction?: string;
-  sectionOrder?: string;
-}
-
 function asMuteBehavior(value: string | undefined): MuteBehavior {
   if (value === "refresh-then-toggle") {
     return value;
@@ -65,7 +55,7 @@ export async function saveQuickSettings(
 }
 
 export async function getEffectiveSettings(): Promise<EffectiveSettings> {
-  const preferences = getPreferenceValues<ExtensionPreferences>();
+  const preferences = getPreferenceValues<Preferences>();
   const quick = await loadQuickSettings();
 
   const muteBehavior =
