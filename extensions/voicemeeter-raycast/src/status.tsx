@@ -78,11 +78,20 @@ export default function Command() {
           ]}
           actions={
             <ActionPanel>
-              <Action title="Refresh Snapshot" onAction={refreshEverything} />
-              <Action title="Launch Voicemeeter" onAction={handleLaunch} />
+              <Action
+                title="Refresh Snapshot"
+                onAction={refreshEverything}
+                icon={Icon.Gear}
+              />
+              <Action
+                title="Launch Voicemeeter"
+                onAction={handleLaunch}
+                icon={Icon.Gear}
+              />
               <Action
                 title={`Undo Last Change (${undoCount})`}
                 onAction={handleUndo}
+                icon={Icon.Gear}
               />
               <Action.Push
                 title="Quick Settings"
@@ -130,10 +139,12 @@ export default function Command() {
                     <Action
                       title="Refresh Snapshot"
                       onAction={refreshEverything}
+                      icon={Icon.Gear}
                     />
                     <Action
                       title={`Undo Last Change (${undoCount})`}
                       onAction={handleUndo}
+                      icon={Icon.Gear}
                     />
                     <Action.Push
                       title="Quick Settings"
@@ -246,10 +257,12 @@ export default function Command() {
                     <Action
                       title="Refresh Snapshot"
                       onAction={refreshEverything}
+                      icon={Icon.Gear}
                     />
                     <Action
                       title={`Undo Last Change (${undoCount})`}
                       onAction={handleUndo}
+                      icon={Icon.Gear}
                     />
                     <Action.Push
                       title="Quick Settings"
@@ -361,10 +374,12 @@ export default function Command() {
                     <Action
                       title="Refresh Snapshot"
                       onAction={refreshEverything}
+                      icon={Icon.Gear}
                     />
                     <Action
                       title={`Undo Last Change (${undoCount})`}
                       onAction={handleUndo}
+                      icon={Icon.Gear}
                     />
                     <Action.Push
                       title="Quick Settings"
@@ -378,6 +393,14 @@ export default function Command() {
           </List.Section>
         </>
       )}
+
+      {!isLoading &&
+      strips.length + buses.length + hiddenTargets.length === 0 ? (
+        <List.EmptyView
+          title="No targets"
+          description="Voicemeeter not connected or no visible targets."
+        />
+      ) : null}
 
       {hiddenTargets.length > 0 ? (
         <List.Section title="Hidden">
@@ -397,6 +420,7 @@ export default function Command() {
                   <Action
                     title="Refresh Snapshot"
                     onAction={refreshEverything}
+                    icon={Icon.Gear}
                   />
                 </ActionPanel>
               }

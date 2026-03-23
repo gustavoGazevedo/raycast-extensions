@@ -83,13 +83,15 @@ export default function Command() {
   function renderVolumeActions(target: VoicemeeterTarget) {
     return (
       <>
+        // eslint-disable-next-line @raycast/prefer-title-case
         <Action
-          title={`Increase By ${settings.increaseStep} dB`}
+          title={`Increase Volume`}
           shortcut={increaseShortcut}
           onAction={() => handleStep(target, settings.increaseStep)}
         />
+        // eslint-disable-next-line @raycast/prefer-title-case
         <Action
-          title={`Decrease By ${settings.decreaseStep} dB`}
+          title={`Decrease Volume`}
           shortcut={decreaseShortcut}
           onAction={() => handleStep(target, -settings.decreaseStep)}
         />
@@ -128,8 +130,16 @@ export default function Command() {
           ]}
           actions={
             <ActionPanel>
-              <Action title="Refresh" onAction={refreshEverything} />
-              <Action title="Launch Voicemeeter" onAction={handleLaunch} />
+              <Action
+                title="Refresh"
+                onAction={refreshEverything}
+                icon={Icon.Gear}
+              />
+              <Action
+                title="Launch Voicemeeter"
+                onAction={handleLaunch}
+                icon={Icon.Gear}
+              />
               <Action.Push
                 title="Quick Settings"
                 target={<QuickSettingsForm onSaved={refreshEverything} />}
@@ -185,8 +195,13 @@ export default function Command() {
                     <Action
                       title={`Undo Last Change (${undoCount})`}
                       onAction={handleUndo}
+                      icon={Icon.Gear}
                     />
-                    <Action title="Refresh" onAction={refreshEverything} />
+                    <Action
+                      title="Refresh"
+                      onAction={refreshEverything}
+                      icon={Icon.Gear}
+                    />
                     <Action.Push
                       title="Quick Settings"
                       target={<QuickSettingsForm onSaved={refreshEverything} />}
@@ -240,8 +255,13 @@ export default function Command() {
                     <Action
                       title={`Undo Last Change (${undoCount})`}
                       onAction={handleUndo}
+                      icon={Icon.Gear}
                     />
-                    <Action title="Refresh" onAction={refreshEverything} />
+                    <Action
+                      title="Refresh"
+                      onAction={refreshEverything}
+                      icon={Icon.Gear}
+                    />
                     <Action.Push
                       title="Quick Settings"
                       target={<QuickSettingsForm onSaved={refreshEverything} />}
@@ -299,7 +319,11 @@ export default function Command() {
                       title={`Undo Last Change (${undoCount})`}
                       onAction={handleUndo}
                     />
-                    <Action title="Refresh" onAction={refreshEverything} />
+                    <Action
+                      title="Refresh"
+                      onAction={refreshEverything}
+                      icon={Icon.Gear}
+                    />
                     <Action.Push
                       title="Quick Settings"
                       target={<QuickSettingsForm onSaved={refreshEverything} />}
@@ -354,7 +378,11 @@ export default function Command() {
                       title={`Undo Last Change (${undoCount})`}
                       onAction={handleUndo}
                     />
-                    <Action title="Refresh" onAction={refreshEverything} />
+                    <Action
+                      title="Refresh"
+                      onAction={refreshEverything}
+                      icon={Icon.Gear}
+                    />
                     <Action.Push
                       title="Quick Settings"
                       target={<QuickSettingsForm onSaved={refreshEverything} />}
@@ -367,6 +395,14 @@ export default function Command() {
           </List.Section>
         </>
       )}
+
+      {!isLoading &&
+      strips.length + buses.length + hiddenTargets.length === 0 ? (
+        <List.EmptyView
+          title="No targets"
+          description="Voicemeeter not connected or no visible targets."
+        />
+      ) : null}
 
       {hiddenTargets.length > 0 ? (
         <List.Section title="Hidden">
@@ -383,7 +419,11 @@ export default function Command() {
                     onAction={() => toggleHidden(target)}
                     icon={Icon.Eye}
                   />
-                  <Action title="Refresh" onAction={refreshEverything} />
+                  <Action
+                    title="Refresh"
+                    onAction={refreshEverything}
+                    icon={Icon.Gear}
+                  />
                 </ActionPanel>
               }
             />

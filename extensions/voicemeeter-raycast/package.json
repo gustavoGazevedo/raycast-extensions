@@ -1,14 +1,24 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "voicemeeter-raycast",
+  "name": "voicemeeter",
   "title": "Voicemeeter Control",
   "description": "Control Voicemeeter strips and buses from Raycast.",
   "icon": "extension-icon.png",
   "author": "Vorm--",
   "license": "MIT",
-  "platforms": ["Windows"],
-  "categories": ["System", "Media", "Productivity", "Communication"],
-  "external": ["koffi", "react"],
+  "platforms": [
+    "Windows"
+  ],
+  "categories": [
+    "System",
+    "Media",
+    "Productivity",
+    "Communication"
+  ],
+  "external": [
+    "koffi",
+    "react"
+  ],
   "commands": [
     {
       "name": "mute",
@@ -102,8 +112,14 @@
       "required": false,
       "default": "increase",
       "data": [
-        { "title": "Increase Volume", "value": "increase" },
-        { "title": "Decrease Volume", "value": "decrease" }
+        {
+          "title": "Increase Volume",
+          "value": "increase"
+        },
+        {
+          "title": "Decrease Volume",
+          "value": "decrease"
+        }
       ]
     },
     {
@@ -114,8 +130,14 @@
       "required": false,
       "default": "buses-first",
       "data": [
-        { "title": "Strips First", "value": "strips-first" },
-        { "title": "Buses First", "value": "buses-first" }
+        {
+          "title": "Strips First",
+          "value": "strips-first"
+        },
+        {
+          "title": "Buses First",
+          "value": "buses-first"
+        }
       ]
     }
   ],
@@ -134,7 +156,6 @@
   },
   "scripts": {
     "build": "ray build -e dist -o dist",
-    "postbuild": "npm install --prefix dist --omit=dev --omit=peer && node scripts/sync-to-extensions.js",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",

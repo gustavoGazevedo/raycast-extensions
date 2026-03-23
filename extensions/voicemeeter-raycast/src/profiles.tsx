@@ -97,8 +97,16 @@ export default function Command() {
           ]}
           actions={
             <ActionPanel>
-              <Action title="Refresh" onAction={refreshEverything} />
-              <Action title="Launch Voicemeeter" onAction={handleLaunch} />
+              <Action
+                title="Refresh"
+                onAction={refreshEverything}
+                icon={Icon.Gear}
+              />
+              <Action
+                title="Launch Voicemeeter"
+                onAction={handleLaunch}
+                icon={Icon.Gear}
+              />
               <Action.Push
                 title="Quick Settings"
                 target={<QuickSettingsForm onSaved={refreshEverything} />}
@@ -124,13 +132,18 @@ export default function Command() {
                     onSubmitProfile={handleSaveProfile}
                   />
                 }
+                icon={Icon.Plus}
               />
               <Action.Push
                 title="Quick Settings"
                 target={<QuickSettingsForm onSaved={refreshEverything} />}
                 icon={Icon.Gear}
               />
-              <Action title="Refresh" onAction={refreshEverything} />
+              <Action
+                title="Refresh"
+                onAction={refreshEverything}
+                icon={Icon.Gear}
+              />
             </ActionPanel>
           }
         />
@@ -141,7 +154,7 @@ export default function Command() {
           <List.Item
             key={profile.id}
             title={profile.name}
-            subtitle={`Updated ${new Date(profile.updatedAt).toLocaleString()}`}
+            subtitle={`Updated ${new Date(profile.updatedAt).toLocaleString("en-US")}`}
             accessories={[
               {
                 text: `${Object.keys(profile.overrides).length} overrides`,
@@ -152,6 +165,7 @@ export default function Command() {
                 <Action
                   title="Apply Profile"
                   onAction={() => handleApplyProfile(profile)}
+                  icon={Icon.Gear}
                 />
                 <Action.Push
                   title="Edit Profile"
@@ -162,17 +176,24 @@ export default function Command() {
                       onSubmitProfile={handleSaveProfile}
                     />
                   }
+                  icon={Icon.Gear}
                 />
                 <Action
                   title="Delete Profile"
                   onAction={() => handleDeleteProfile(profile)}
                   style={Action.Style.Destructive}
+                  icon={Icon.Gear}
                 />
                 <Action
                   title={`Undo Last Change (${undoCount})`}
                   onAction={handleUndo}
+                  icon={Icon.Gear}
                 />
-                <Action title="Refresh" onAction={refreshEverything} />
+                <Action
+                  title="Refresh"
+                  onAction={refreshEverything}
+                  icon={Icon.Gear}
+                />
                 <Action.Push
                   title="Quick Settings"
                   target={<QuickSettingsForm onSaved={refreshEverything} />}
@@ -183,6 +204,13 @@ export default function Command() {
           />
         ))}
       </List.Section>
+
+      {!isProfilesLoading && profiles.length === 0 ? (
+        <List.EmptyView
+          title="No profiles"
+          description="Create a profile using Create Profile."
+        />
+      ) : null}
     </List>
   );
 }

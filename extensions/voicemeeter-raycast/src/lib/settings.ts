@@ -54,6 +54,16 @@ export async function saveQuickSettings(
   await writeJson<QuickSettings>(QUICK_SETTINGS_KEY, settings);
 }
 
+interface Preferences {
+  muteBehavior?: string;
+  undoTtlSeconds?: string;
+  voicemeeterExecutablePath?: string;
+  increaseStep?: string;
+  decreaseStep?: string;
+  volumePrimaryAction?: string;
+  sectionOrder?: string;
+}
+
 export async function getEffectiveSettings(): Promise<EffectiveSettings> {
   const preferences = getPreferenceValues<Preferences>();
   const quick = await loadQuickSettings();
