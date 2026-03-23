@@ -104,7 +104,7 @@ export default function Command() {
             title="Quick Settings"
             target={<QuickSettingsForm onSaved={refreshEverything} />}
             icon={Icon.Gear}
-            shortcut={{ modifiers: ["cmd"], key: "," }}
+            shortcut={{ modifiers: ["cmd"], key: ";" }}
           />
         </ActionPanel>
       }

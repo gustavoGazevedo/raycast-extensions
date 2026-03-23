@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "voicemeeter",
+  "name": "voicemeeter-raycast",
   "title": "Voicemeeter Control",
   "description": "Control Voicemeeter strips and buses from Raycast.",
   "icon": "extension-icon.png",
@@ -15,10 +15,6 @@
     "Productivity",
     "Communication"
   ],
-  "external": [
-    "koffi",
-    "react"
-  ],
   "commands": [
     {
       "name": "mute",
@@ -32,6 +28,13 @@
       "title": "Adjust Volume",
       "subtitle": "Voicemeeter",
       "description": "Adjust Voicemeeter volume by quick steps or absolute values.",
+      "mode": "view"
+    },
+    {
+      "name": "connections",
+      "title": "Manage Connections",
+      "subtitle": "Voicemeeter",
+      "description": "Connect or disconnect strips to Voicemeeter buses.",
       "mode": "view"
     },
     {
@@ -143,7 +146,7 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.104.0",
-    "koffi": "^2.10.0"
+    "koffi": "^2.15.1"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"
@@ -155,10 +158,11 @@
     "typescript": "^5.7.2"
   },
   "scripts": {
-    "build": "ray build -e dist -o dist",
+    "build": "ray build",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",
-    "publish": "npx @raycast/api@latest publish"
+    "publish": "npx @raycast/api@latest publish",
+    "koffi": "node scripts/fetch-koffi.js"
   }
 }

@@ -10,9 +10,11 @@ import {
   VoicemeeterTarget,
 } from "./types";
 import {
+  getRouteTokenForBusIndex,
   launchVoicemeeter,
   readTargetCurrentMute,
   readVoicemeeterState,
+  writeStripRoute,
   writeTargetGain,
   writeTargetMute,
 } from "./voicemeeter";
@@ -198,9 +200,62 @@ export async function setTargetGain(
   });
 }
 
+export async function setStripBusConnection(
+  strip: VoicemeeterTarget,
+  bus: VoicemeeterTarget,
+  enabled: boolean,
+  capabilities: VoicemeeterState["capabilities"],
+): Promise<ActionResult> {
+  return enqueueSerialized(async () => {
+    if (strip.kind !== "strip" || bus.kind !== "bus") {
+      return {
+        ok: false,
+        skipped: true,
+        message: "Invalid target pair.",
+      };
+    }
+
+    const routeToken = getRouteTokenForBusIndex(
+      capabilities.edition,
+      capabilities.busCount,
+      bus.index,
+    );
+    if (!routeToken) {
+      return {
+        ok: false,
+        skipped: true,
+        message: "Bus route is not available.",
+      };
+    }
+
+    const before = strip.routes?.[bus.index];
+    if (before !== undefined && before === enabled) {
+      return {
+        ok: true,
+        message: `${strip.name} already ${enabled ? "connected to" : "disconnected from"} ${bus.name}.`,
+      };
+    }
+
+    const changed = await writeStripRoute(strip.index, routeToken, enabled);
+    if (!changed) {
+      return {
+        ok: false,
+        skipped: true,
+        message: "Skipped: Voicemeeter unavailable.",
+      };
+    }
+
+    return {
+      ok: true,
+      message: `${strip.name}: ${enabled ? "connected to" : "disconnected from"} ${bus.name}.`,
+    };
+  });
+}
+
 export async function applyProfile(
   profile: ProfileDefinition,
   targets: VoicemeeterTarget[],
+  capabilities: VoicemeeterState["capabilities"],
 ): Promise<ActionResult> {
   return enqueueSerialized(async () => {
     const settings = await getEffectiveSettings();
@@ -237,6 +292,27 @@ export async function applyProfile(
             settings.undoTtlMs,
           );
           changedCount += 1;
+        }
+      }
+    }
+
+    if (profile.routes) {
+      const strips = targets.filter((t) => t.kind === "strip");
+      for (const strip of strips) {
+        const routes = profile.routes[strip.id];
+        if (!routes) continue;
+        for (let busIndex = 0; busIndex < routes.length; busIndex += 1) {
+          const routeToken = getRouteTokenForBusIndex(
+            capabilities.edition,
+            capabilities.busCount,
+            busIndex,
+          );
+          if (!routeToken) continue;
+          const enabled = routes[busIndex] ?? false;
+          const current = strip.routes?.[busIndex] ?? false;
+          if (current === enabled) continue;
+          const ok = await writeStripRoute(strip.index, routeToken, enabled);
+          if (ok) changedCount += 1;
         }
       }
     }

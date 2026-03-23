@@ -12,6 +12,7 @@ Control Voicemeeter strips and buses from Raycast on Windows.
 
 - **Mute Channels**: Toggle, mute, or unmute strips and buses with selectable stale-state behavior
 - **Adjust Volume**: Quick step controls and absolute dB input
+- **Manage Connections**: Connect or disconnect strips to each available bus
 - **Manage Profiles**: Create and apply global presets with per-target overrides
 - **View Status**: Connection status and current mute/volume snapshot
 

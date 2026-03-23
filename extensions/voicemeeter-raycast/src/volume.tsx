@@ -72,29 +72,42 @@ export default function Command() {
   const hiddenTargets = state.targets.filter((t) => isHidden(t, hidden));
 
   const primaryIncrease = settings.volumePrimaryAction === "increase";
-  const enterShortcut: Keyboard.Shortcut = { modifiers: [], key: "enter" };
-  const ctrlEnterShortcut: Keyboard.Shortcut = {
+  const secondaryShortcut: Keyboard.Shortcut = {
     modifiers: ["ctrl"],
     key: "enter",
   };
-  const increaseShortcut = primaryIncrease ? enterShortcut : ctrlEnterShortcut;
-  const decreaseShortcut = primaryIncrease ? ctrlEnterShortcut : enterShortcut;
 
   function renderVolumeActions(target: VoicemeeterTarget) {
+    const increaseAction = (
+      <Action
+        title="Increase Volume"
+        onAction={() => handleStep(target, settings.increaseStep)}
+      />
+    );
+    const decreaseAction = (
+      <Action
+        title="Decrease Volume"
+        shortcut={secondaryShortcut}
+        onAction={() => handleStep(target, -settings.decreaseStep)}
+      />
+    );
+
     return (
       <>
-        // eslint-disable-next-line @raycast/prefer-title-case
-        <Action
-          title={`Increase Volume`}
-          shortcut={increaseShortcut}
-          onAction={() => handleStep(target, settings.increaseStep)}
-        />
-        // eslint-disable-next-line @raycast/prefer-title-case
-        <Action
-          title={`Decrease Volume`}
-          shortcut={decreaseShortcut}
-          onAction={() => handleStep(target, -settings.decreaseStep)}
-        />
+        {primaryIncrease ? increaseAction : decreaseAction}
+        {primaryIncrease ? (
+          <Action
+            title="Decrease Volume"
+            shortcut={secondaryShortcut}
+            onAction={() => handleStep(target, -settings.decreaseStep)}
+          />
+        ) : (
+          <Action
+            title="Increase Volume"
+            shortcut={secondaryShortcut}
+            onAction={() => handleStep(target, settings.increaseStep)}
+          />
+        )}
         <Action.Push
           title="Set Absolute Volume"
           target={

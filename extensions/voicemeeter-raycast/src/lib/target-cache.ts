@@ -1,8 +1,16 @@
 import { VoicemeeterState, VoicemeeterTarget } from "./types";
 
-export type CacheUpdate = { targetId: string; mute?: boolean; gain?: number };
+export type CacheUpdate = {
+  targetId: string;
+  mute?: boolean;
+  gain?: number;
+  routes?: boolean[];
+};
 
-const cache = new Map<string, { mute?: boolean; gain?: number }>();
+const cache = new Map<
+  string,
+  { mute?: boolean; gain?: number; routes?: boolean[] }
+>();
 
 export function setMute(targetId: string, mute: boolean): void {
   const entry = cache.get(targetId) ?? {};
@@ -16,9 +24,19 @@ export function setGain(targetId: string, gain: number): void {
   cache.set(targetId, entry);
 }
 
+export function setRoutes(targetId: string, routes: boolean[]): void {
+  const entry = cache.get(targetId) ?? {};
+  entry.routes = routes;
+  cache.set(targetId, entry);
+}
+
 export function applyFromVoicemeeter(state: VoicemeeterState): void {
   for (const target of state.targets) {
-    cache.set(target.id, { mute: target.mute, gain: target.gain });
+    cache.set(target.id, {
+      mute: target.mute,
+      gain: target.gain,
+      ...(target.routes && { routes: target.routes }),
+    });
   }
 }
 
@@ -32,6 +50,7 @@ export function mergeIntoState(state: VoicemeeterState): VoicemeeterState {
       ...target,
       ...(cached.mute !== undefined && { mute: cached.mute }),
       ...(cached.gain !== undefined && { gain: cached.gain }),
+      ...(cached.routes !== undefined && { routes: cached.routes }),
     };
   });
   return { ...state, targets };

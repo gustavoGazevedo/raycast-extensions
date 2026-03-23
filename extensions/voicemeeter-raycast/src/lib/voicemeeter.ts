@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import path from "node:path";
+import { environment } from "@raycast/api";
 import { getEffectiveSettings } from "./settings";
 import {
   createTargetIdentityKeys,
@@ -13,7 +14,20 @@ import {
   VoicemeeterTarget,
 } from "./types";
 
-import koffi from "koffi";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let koffi: any = null;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const savedResourcesPath = (process as any).resourcesPath;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (process as any).resourcesPath = path.join(environment.assetsPath, "native");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  koffi = require("koffi/indirect");
+} finally {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (process as any).resourcesPath = savedResourcesPath;
+}
 
 type NativeApi = {
   VBVMR_Login: () => number;
@@ -120,6 +134,34 @@ function mapEdition(
     return { edition: "potato", stripCount: 8, busCount: 8 };
   }
   return { edition: "unknown", stripCount: 0, busCount: 0 };
+}
+
+const ROUTE_TOKENS_BY_EDITION: Record<
+  VoicemeeterCapabilities["edition"],
+  string[]
+> = {
+  standard: ["A1", "B1"],
+  banana: ["A1", "A2", "A3", "B1", "B2"],
+  potato: ["A1", "A2", "A3", "A4", "A5", "B1", "B2", "B3"],
+  unknown: ["A1", "A2", "A3", "A4", "A5", "B1", "B2", "B3"],
+};
+
+function getRouteTokens(
+  edition: VoicemeeterCapabilities["edition"],
+  busCount: number,
+): string[] {
+  return ROUTE_TOKENS_BY_EDITION[edition].slice(0, busCount);
+}
+
+export function getRouteTokenForBusIndex(
+  edition: VoicemeeterCapabilities["edition"],
+  busCount: number,
+  busIndex: number,
+): string | undefined {
+  if (busIndex < 0 || busIndex >= busCount) {
+    return undefined;
+  }
+  return getRouteTokens(edition, busCount)[busIndex];
 }
 
 class VoicemeeterClient {
@@ -305,6 +347,7 @@ function buildTargets(
   client: VoicemeeterClient,
   kind: TargetKind,
   count: number,
+  routeTokens: string[],
 ): VoicemeeterTarget[] {
   const targets: VoicemeeterTarget[] = [];
 
@@ -318,8 +361,13 @@ function buildTargets(
     const label = client.getString(`${head}[${index}].Label`);
     const name = mergeTargetName(kind, index, label);
     let deviceIn: string | undefined;
+    let routes: boolean[] | undefined;
     if (kind === "strip") {
       deviceIn = client.getString(`Strip[${index}].device.in`) ?? undefined;
+      routes = routeTokens.map((token) => {
+        const value = client.getFloat(`Strip[${index}].${token}`);
+        return value !== undefined && value >= 0.5;
+      });
     }
     targets.push({
       id: buildTargetId(kind, index, name),
@@ -329,6 +377,7 @@ function buildTargets(
       gain,
       mute: mute >= 0.5,
       identityKeys: createTargetIdentityKeys(kind, index, name),
+      ...(routes && { routes }),
       ...(deviceIn && { deviceIn }),
     });
   }
@@ -377,8 +426,9 @@ export async function readVoicemeeterState(): Promise<VoicemeeterState> {
     busCount = detectCount(client, "bus", 16);
   }
 
-  const strips = buildTargets(client, "strip", stripCount);
-  const buses = buildTargets(client, "bus", busCount);
+  const routeTokens = getRouteTokens(mapped.edition, busCount);
+  const strips = buildTargets(client, "strip", stripCount, routeTokens);
+  const buses = buildTargets(client, "bus", busCount, routeTokens);
 
   return {
     connected: true,
@@ -433,6 +483,25 @@ export async function writeTargetGain(
   }
 
   const ok = client.setFloat(makeParameter(target, "Gain"), gain);
+  if (ok) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return ok;
+}
+
+export async function writeStripRoute(
+  stripIndex: number,
+  routeToken: string,
+  enabled: boolean,
+): Promise<boolean> {
+  const client = await getSharedClient();
+  if (!client) {
+    return false;
+  }
+  const ok = client.setFloat(
+    `Strip[${stripIndex}].${routeToken}`,
+    enabled ? 1 : 0,
+  );
   if (ok) {
     await new Promise((r) => setTimeout(r, 50));
   }

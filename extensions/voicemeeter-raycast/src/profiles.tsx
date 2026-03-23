@@ -17,12 +17,14 @@ import {
 } from "./lib/controller";
 import { notifyAction } from "./lib/feedback";
 import { deleteProfile, listProfiles, saveProfile } from "./lib/profiles";
+import { MAX_GAIN_DB, MIN_GAIN_DB } from "./lib/target";
 import { useEffectiveSettings } from "./lib/use-settings";
 import { useVoicemeeterState } from "./lib/use-vm-state";
 import { ProfileDefinition } from "./lib/types";
 
 export default function Command() {
-  const { state, undoCount, isLoading, refresh } = useVoicemeeterState();
+  const { state, undoCount, isLoading, refresh, applyCacheUpdate } =
+    useVoicemeeterState();
   const { refreshSettings } = useEffectiveSettings();
   const [profiles, setProfiles] = useState<ProfileDefinition[]>([]);
   const [isProfilesLoading, setIsProfilesLoading] = useState(true);
@@ -55,9 +57,54 @@ export default function Command() {
   }
 
   async function handleApplyProfile(profile: ProfileDefinition) {
-    const result = await applyProfile(profile, state.targets);
+    const result = await applyProfile(
+      profile,
+      state.targets,
+      state.capabilities,
+    );
     await notifyAction(result);
-    await refresh();
+    if (result.ok) {
+      const updates: Array<{
+        targetId: string;
+        mute?: boolean;
+        gain?: number;
+        routes?: boolean[];
+      }> = [];
+      for (const target of state.targets) {
+        const override = target.identityKeys
+          .map((k) => profile.overrides[k])
+          .find(Boolean);
+        const mute = override?.mute ?? profile.global.mute;
+        const gain = override?.gain ?? profile.global.gain;
+        if (typeof mute === "boolean") {
+          updates.push({ targetId: target.id, mute });
+        }
+        if (
+          typeof gain === "number" &&
+          Number.isFinite(gain) &&
+          gain >= MIN_GAIN_DB &&
+          gain <= MAX_GAIN_DB
+        ) {
+          updates.push({
+            targetId: target.id,
+            gain: Math.round(gain * 100) / 100,
+          });
+        }
+      }
+      if (profile.routes) {
+        for (const strip of state.targets.filter((t) => t.kind === "strip")) {
+          const routes = profile.routes[strip.id];
+          if (routes) {
+            updates.push({ targetId: strip.id, routes });
+          }
+        }
+      }
+      if (updates.length > 0) {
+        await applyCacheUpdate(updates);
+      }
+    } else {
+      await refresh();
+    }
   }
 
   async function handleUndo() {
@@ -157,7 +204,14 @@ export default function Command() {
             subtitle={`Updated ${new Date(profile.updatedAt).toLocaleString("en-US")}`}
             accessories={[
               {
-                text: `${Object.keys(profile.overrides).length} overrides`,
+                text: [
+                  `${Object.keys(profile.overrides).length} overrides`,
+                  profile.routes && Object.keys(profile.routes).length > 0
+                    ? "connections"
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(" • "),
               },
             ]}
             actions={

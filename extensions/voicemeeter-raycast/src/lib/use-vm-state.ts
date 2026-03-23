@@ -5,6 +5,7 @@ import {
   mergeIntoState,
   setGain,
   setMute,
+  setRoutes,
 } from "./target-cache";
 import type { CacheUpdate } from "./target-cache";
 import { VoicemeeterState } from "./types";
@@ -45,6 +46,7 @@ export function useVoicemeeterState() {
       for (const u of list) {
         if (u.mute !== undefined) setMute(u.targetId, u.mute);
         if (u.gain !== undefined) setGain(u.targetId, u.gain);
+        if (u.routes !== undefined) setRoutes(u.targetId, u.routes);
       }
       setState((prev) => mergeIntoState(prev));
       const nextUndoCount = await getUndoCount();

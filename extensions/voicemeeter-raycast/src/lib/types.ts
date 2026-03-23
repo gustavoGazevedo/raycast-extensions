@@ -12,6 +12,7 @@ export interface VoicemeeterTarget {
   name: string;
   gain: number;
   mute: boolean;
+  routes?: boolean[];
   identityKeys: string[];
   deviceIn?: string;
 }
@@ -82,6 +83,7 @@ export interface ProfileDefinition {
   updatedAt: number;
   global: ProfileTargetOverride;
   overrides: Record<string, ProfileTargetOverride>;
+  routes?: Record<string, boolean[]>;
 }
 
 export interface ActionResult {
