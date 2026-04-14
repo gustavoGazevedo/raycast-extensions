@@ -90,4 +90,5 @@ export interface ActionResult {
   ok: boolean;
   skipped?: boolean;
   message: string;
+  newMute?: boolean;
 }

@@ -2,6 +2,8 @@
 
 ## [Initial Release] - {PR_MERGE_DATE}
 
+- Fix mute cache updates to use explicit controller state instead of parsing action messages
+- Reset cached shared client promise after failed Voicemeeter connection attempts so refresh can reconnect in-session
 - Fix Raycast API type errors in profile defaults and connection action shortcuts/icons
 - Fix Raycast runtime warnings by relying on primary actions for Enter and removing invalid `ActionPanel` string children
 - Load bundled `koffi` native bindings from `assets/native` so packaged Voicemeeter SDK access works reliably

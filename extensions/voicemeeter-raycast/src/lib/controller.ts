@@ -110,6 +110,7 @@ export async function toggleTargetMute(
     return {
       ok: true,
       message: `${target.name}: ${next ? "muted" : "unmuted"}.`,
+      newMute: next,
     };
   });
 }
@@ -132,6 +133,7 @@ export async function setTargetMute(
       return {
         ok: true,
         message: `${target.name} already ${mute ? "muted" : "unmuted"}.`,
+        newMute: mute,
       };
     }
 
@@ -148,6 +150,7 @@ export async function setTargetMute(
     return {
       ok: true,
       message: `${target.name}: ${mute ? "muted" : "unmuted"}.`,
+      newMute: mute,
     };
   });
 }

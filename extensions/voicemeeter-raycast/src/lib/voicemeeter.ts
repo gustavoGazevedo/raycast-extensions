@@ -296,7 +296,16 @@ async function getSharedClient(): Promise<VoicemeeterClient | null> {
     sharedClient = client;
     return client;
   })();
-  return sharedClientPromise;
+  try {
+    const client = await sharedClientPromise;
+    if (!client) {
+      sharedClientPromise = null;
+    }
+    return client;
+  } catch (error) {
+    sharedClientPromise = null;
+    throw error;
+  }
 }
 
 export function disconnectVoicemeeter(): void {
