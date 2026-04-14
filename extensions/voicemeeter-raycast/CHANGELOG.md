@@ -1,6 +1,6 @@
 # Voicemeeter Control
 
-## [Initial Release] - {PR_MERGE_DATE}
+## [Initial Release] - 2026-04-14
 
 - Fix mute cache updates to use explicit controller state instead of parsing action messages
 - Reset cached shared client promise after failed Voicemeeter connection attempts so refresh can reconnect in-session
